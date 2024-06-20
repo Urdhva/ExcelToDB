@@ -35,3 +35,10 @@ print(users.find_one({"usrnm": "Gacha"}))                 #we are calling method
 #     print(user)
 
 # print(users.count_documents())
+
+# SO I MADE MORE CHANGES
+
+# $             $
+#  $           $
+#   $         $
+#     $$$$$$$$
