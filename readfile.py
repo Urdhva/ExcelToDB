@@ -1,65 +1,67 @@
-import pandas as pd
-import tempfile
-import csv
+import pandas as pd     #file database management
+from pymongo import MongoClient
 
+def deleteData():               #deletes every document in the database
+    client = MongoClient("localhost", 27017)
 
-def test():             #use this for trying out things
-    # phrase = 'https://music.youtube.com/watch?v=fYBQJfPBmRg&list=RDAMVMRWFW1OSlMkM'
-    # words = phrase.split(sep='/')
-    # print(words)
+    db = client.facebook_users          #import database
 
-    with tempfile.TemporaryFile() as fp:
-        fp.write(b'Hello World')
-        fp.seek(0)
-        print(fp.read())
+    users = db.users
 
+    result = users.delete_many({})
 
-def writeToEXCEL():     #use a loop to go through every cell, check if the link has music.com, add creater to creators.csv
-    pass
+    if result.deleted_count > 0:
+        print(f"{result.deleted_count} documents deleted successfully!")
+    else:
+        print("No documents were deleted (collection might be empty).")
 
+    # Close the connection (optional, good practice)
+    client.close()
 
-def writeCSVdefault(df):     #writes data not present into a CSV file
-    with open('C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\creators.csv', 'a', newline='') as csv_file:
-        write = csv.writer(csv_file)        #creates a writer object that goes through the CSV file line by line
-    
-        links = df['Link']
-        usernames = df['Username']
+def findAccounts():             #goes through the excel sheet for facebook accounts
+    EXCEL_FILE = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx'
 
-        for link, username in zip(links, usernames):    #separate each cell in both columns
-            link_bd = link.split(sep='/')               #link_breakdown: contains parts of a link separated by '/'
-            if link_bd[2] == 'music.youtube.com':
-                write.writerow([username])
+    df = pd.read_excel(EXCEL_FILE)  #df is a temporary data frame in python made to store our excel sheet's data
 
+    links = df['Link']      #list of the elements in the link collumn
+    accounts = []
 
-# def writeCSVpandas(df_excel):
-#     # df_csv = pd.read_csv('C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\creators.csv')   #create a dataframe
-#     #remember, we create a dataframe when we want to edit that dataframe.
-#     #we use to_csv to add to a csv file
-
-
-#     links = df_excel['Link']
-#     usernames = df_excel['Username']
-
-#     for link, username in zip(links, usernames):
-#         link_bd = link.split(sep='/')
-#         if link_bd[2] == 'music.youtube.com':
+    for link in links:      #go through every link one by one
+        link_parts = link.split(sep="/")        #creates smaller words between the slashes
+        if link_parts[2] == "www.facebook.com":     #checks if a facebook link is present
+            username = link_parts[3].split(sep="?")
             
+            if username[0] == "permalink.php":      #remove this string from being considered
+                continue
 
-def erase_CSV():        #truncates all data in a csv file
-    file = open('C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\creators.csv', 'w')
-    file.truncate()
-    file.close()
+            accounts.append(username[0])        #add username to accounts list
+
+    # for account in accounts:          #prints usernames from the parsed links
+    #     print(account)
+
+    return accounts
+
+def addToDB(accounts):          #add accounts to the database
+    client = MongoClient("localhost", 27017)
+
+    db = client.facebook_users          #import database
+
+    users = db.users            #imports collection
+    #users here is a COLLECTOIN! NOT A LIST
+
+    for account in accounts:    #iterates through the list of usernames
+        if users.find_one({"usrnm": account}) == None:      #check if you find an account with the same name
+            # print("none found")
+            users.insert_one({"usrnm": account})            #add username to database if not present
+        else:
+            print("User found, skipped")
+
+    
+def main():     #action happens here
+    accounts = findAccounts()
+    addToDB(accounts)
 
 
-def main():
-    EXEC_FILE = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Internet_Data.xlsx'
-    # CSV_FILE = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\creators.csv'
-
-    df = pd.read_excel(EXEC_FILE)   #creates a data frame for our excel file
-    writeCSVdefault(df) 
-    # erase_CSV()
-
-
-# test()
 main()
-
+# deleteData()
+    
