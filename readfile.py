@@ -1,6 +1,6 @@
 import pandas as pd     #file database management
 from pymongo import MongoClient
-import openpyxl as pyxl
+import magic            #used for file type checking
 
 def deleteData():               #deletes every document in the database
     client = MongoClient("localhost", 27017)
@@ -19,9 +19,9 @@ def deleteData():               #deletes every document in the database
     # Close the connection (optional, good practice)
     client.close()
 
-def findAccounts():             #goes through the excel sheet for facebook accounts
+def findAccounts(EXCEL_FILE):             #goes through the excel sheet for facebook accounts
     # EXCEL_FILE = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx'
-    EXCEL_FILE = 'Sample_data_file.xlsx'
+    # EXCEL_FILE = 'Sample_data_file.xlsx'
     # output_file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx'
 
     df = pd.read_excel(EXCEL_FILE)  #df is a temporary data frame in python made to store our excel sheet's data
@@ -87,13 +87,32 @@ def addToDB(accounts, dates, activs, dists, orgs):          #add accounts to the
             print("User found, skipped")
 
     
-# def getExcelFile():
-#     print("Enter an excel file")
+def getExcelFile():
+    #try except statement won't work here because it's used to catch run-time errors
+    #we won't reach our run time error for rinputing the wrong file until much late
+
+    file = ''
+    file_type = ''
+
+    while True:
+        try:
+            file = input("Enter an excel file: ")
+            file_type = magic.from_file(file)
+        except:
+            pass
+        
+        if file_type.startswith("Microsoft Excel"):
+            print("Correct file type")
+            break
+        else:
+            print("Invalid file or file type")
+
+    return file
 
 
 def main():     #action happens here
-
-    dataLists = findAccounts()          #this var is a tuple here because we are returning a tuple of lists
+    file = getExcelFile()
+    dataLists = findAccounts(file)          #this var is a tuple here because we are returning a tuple of lists
     accounts = dataLists[0]
     dates = dataLists[1]
     activs = dataLists[2]
@@ -106,6 +125,7 @@ def main():     #action happens here
 
 # deleteData()
 main()
+# getExcelFile()
 
 
 #read and write an excel sheet at the same time:
