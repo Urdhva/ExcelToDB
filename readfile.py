@@ -20,9 +20,18 @@ def deleteData():               #deletes every document in the database
     client.close()
 
 def findAccounts():             #goes through the excel sheet for facebook accounts
-    EXCEL_FILE = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx'
+    # EXCEL_FILE = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx'
+    EXCEL_FILE = 'Sample_data_file.xlsx'
+    # output_file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx'
 
     df = pd.read_excel(EXCEL_FILE)  #df is a temporary data frame in python made to store our excel sheet's data
+    df = df.assign(Username='')     #adds an empty column to the excel sheet if not present by the same name
+
+    row_to_modify = 0
+    col_to_modify = 'Username'
+
+    
+
 
     links = df['Link']          #list of the elements in the link collumn
     dates = df['Date of Entry']
@@ -44,17 +53,22 @@ def findAccounts():             #goes through the excel sheet for facebook accou
             
             if username[0] == "permalink.php":      #remove this string from being considered
                 continue
+            
+            # cellM = df.loc[row_to_modify, col_to_modify]        #find the cell we wanna modify
+            df.loc[row_to_modify, col_to_modify] = username[0]
 
             fAccount.append(username[0])        #add username to accounts list
             fDate.append(date)
             fActiv.append(activity)
             fDist.append(district)
             fOrg.append(org)
+        row_to_modify += 1
 
 
     for org in fOrg:          #prints usernames from the parsed links
         print(org)
 
+    df = df.to_excel('C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx', index=False)
     return fAccount, fDate, fActiv, fDist, fOrg
 
 def addToDB(accounts, dates, activs, dists, orgs):          #add accounts to the database
@@ -73,7 +87,12 @@ def addToDB(accounts, dates, activs, dists, orgs):          #add accounts to the
             print("User found, skipped")
 
     
+# def getExcelFile():
+#     print("Enter an excel file")
+
+
 def main():     #action happens here
+
     dataLists = findAccounts()          #this var is a tuple here because we are returning a tuple of lists
     accounts = dataLists[0]
     dates = dataLists[1]
@@ -85,7 +104,7 @@ def main():     #action happens here
 
 
 
-deleteData()
+# deleteData()
 main()
 
 
