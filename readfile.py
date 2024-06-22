@@ -1,6 +1,9 @@
+# To start and stop your mognoDB server: Windows + R; type "services.msc" and look for MongoDB server
+
 import pandas as pd     #file database management
 from pymongo import MongoClient
-import magic            #used for file type checking
+import magic            #used for file type checking - doesn't work on excel files for some reason
+
 
 def deleteData():               #deletes every document in the database
     client = MongoClient("localhost", 27017)
@@ -19,18 +22,13 @@ def deleteData():               #deletes every document in the database
     # Close the connection (optional, good practice)
     client.close()
 
-def findAccounts(EXCEL_FILE):             #goes through the excel sheet for facebook accounts
-    # EXCEL_FILE = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx'
-    # EXCEL_FILE = 'Sample_data_file.xlsx'
-    # output_file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx'
 
+def findAccounts(EXCEL_FILE):             #goes through the excel sheet for facebook accounts
     df = pd.read_excel(EXCEL_FILE)  #df is a temporary data frame in python made to store our excel sheet's data
     df = df.assign(Username='')     #adds an empty column to the excel sheet if not present by the same name
 
     row_to_modify = 0
     col_to_modify = 'Username'
-
-    
 
 
     links = df['Link']          #list of the elements in the link collumn
@@ -86,7 +84,7 @@ def addToDB(accounts, dates, activs, dists, orgs):          #add accounts to the
         else:
             print("User found, skipped")
 
-    
+
 def getExcelFile():
     #try except statement won't work here because it's used to catch run-time errors
     #we won't reach our run time error for rinputing the wrong file until much late
@@ -97,20 +95,23 @@ def getExcelFile():
     while True:
         try:
             file = input("Enter an excel file: ")
-            file_type = magic.from_file(file)
+            file_type = magic.from_file(file)       
+            #the method 'from_file' returns the file type, but I'm using it here to make sure the file entered exists
         except:
-            pass
+            print("-----file doesn't exist-------")
         
-        if file_type.startswith("Microsoft Excel"):
+        wordBreak = file.split(".")
+        if wordBreak[-1] == "xlsx":
             print("Correct file type")
             break
         else:
-            print("Invalid file or file type")
+            print("Invalid file or file type\nFile type------>", file_type)
 
     return file
 
 
-def main():     #action happens here
+def execute():     #action happens here
+    # file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx'
     file = getExcelFile()
     dataLists = findAccounts(file)          #this var is a tuple here because we are returning a tuple of lists
     accounts = dataLists[0]
@@ -121,12 +122,24 @@ def main():     #action happens here
 
     addToDB(accounts, dates, activs, dists, orgs)
 
+    print('')
+    main()
 
 
-# deleteData()
+def main():
+    choice = int(input("Insert sheet and add data: 1\nDelete Data: 2\nExit Program: 3\n-> "))
+
+    if choice == 1:
+        execute()
+    elif choice == 2:
+        deleteData()
+    elif choice == 3:
+        print("Exiting program...")
+    else:
+        print("Invalid input")
+
+
 main()
-# getExcelFile()
-
 
 #read and write an excel sheet at the same time:
 # open: parameter: w+
