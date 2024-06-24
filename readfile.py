@@ -22,6 +22,9 @@ def deleteData():               #deletes every document in the database
     # Close the connection (optional, good practice)
     client.close()
 
+    print('')
+    main()
+
 
 def findAccounts(EXCEL_FILE):             #goes through the excel sheet for facebook accounts
     df = pd.read_excel(EXCEL_FILE)  #df is a temporary data frame in python made to store our excel sheet's data
@@ -63,8 +66,8 @@ def findAccounts(EXCEL_FILE):             #goes through the excel sheet for face
         row_to_modify += 1
 
 
-    for org in fOrg:          #prints usernames from the parsed links
-        print(org)
+    for district in fDist:          #prints usernames from the parsed links
+        print(district)
 
     df = df.to_excel('C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx', index=False)
     return fAccount, fDate, fActiv, fDist, fOrg
