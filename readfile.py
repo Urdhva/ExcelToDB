@@ -69,7 +69,7 @@ def findAccounts(EXCEL_FILE):             #goes through the excel sheet for face
     for district in fDist:          #prints usernames from the parsed links
         print(district)
 
-    df = df.to_excel('C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx', index=False)
+    df = df.to_excel(EXCEL_FILE, index=False)
     return fAccount, fDate, fActiv, fDist, fOrg
 
 def addToDB(accounts, dates, activs, dists, orgs):          #add accounts to the database
