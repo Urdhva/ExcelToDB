@@ -1,9 +1,10 @@
 # To start and stop your mognoDB server: Windows + R; type "services.msc" and look for MongoDB server
 
-import pandas as pd     #file database management
+import pandas as pd     #file dataframe management
 from pymongo import MongoClient
+# import pymongo
 import magic            #used for file type checking - doesn't work on excel files for some reason
-
+import csv
 
 def deleteData():               #deletes every document in the database
     client = MongoClient("localhost", 27017)
@@ -113,20 +114,111 @@ def getExcelFile():
     return file
 
 
+def toCSV(EXCEL_FILE):
+    df = pd.read_excel(EXCEL_FILE)      #pandas read excel
+
+    csv_file_path = 'dataInCSV'
+    
+    df.to_csv(csv_file_path, index=False)       #pandas to csv
+
+    return csv_file_path
+
+def store___Mongo(CSV_PATH):
+    client = MongoClient("localhost", 27017)
+    db = client.facebook_users
+    users = db.users
+
+
+    with open(CSV_PATH, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+
+        for doc in reader:
+            forCollec = False       #for inserting into our collection
+            for value in doc.values():
+                link_parts = value.split("/")       #split the link into parts 
+
+                try:    #try statement here incase our value isn't split into a bunch of parts (for every cell except link)
+                    if link_parts[2] == "www.facebook.com":
+                        forCollec = True        #try putting this in a 'finally' statement
+                except:
+                    continue
+
+                if forCollec == True:
+                    username = link_parts[3].split("?")
+                    if username[0] == "permalink.php":
+                        forCollec = False
+                    else:
+                        forCollec = True
+            
+            if forCollec == True:
+                users.insert_one(doc)
+                    
+
+                
+                
+
+def storeInMongo(CSV_PATH):
+
+        # Replace with your connection details
+    client = MongoClient("mongodb://localhost:27017/")
+    db = client.facebook_users
+    users = db.users
+
+    # Open the CSV file
+    with open(CSV_PATH, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+
+        iter = 0
+    # Insert each row as a document in the collection
+        for document_dict in reader:         #document is a dictionary. You need to find a way to parse data from a dictionary
+            temp_dict = document_dict
+            forFacebook = False
+            for value in document_dict.values():    #RETURNS ALL KEYS AND VALUES ONE BY ONE (LINK IS A SINGLE KEY IN THE DICTIONARY)
+                                                                            #we are technically wasting resources parsing every key, but that's fine for now
+                link_parts = value.split("/")            #NOT REALLY, IF WE FIND A STRING WITH LINK, WE PARSE THAT STRING
+                                                #THE ADVANTAGE OF THIS BEING WE DON'T NEED TO LOOK FOR A KEY CALLED LINK
+                                                #THUS EVEN IF THERE ISN'T A COLUMN CALLED LINK, WE CAN PARSE THE FILE
+
+            
+                try:        #if there are no parts of the string (most values won't have parts)
+                    if link_parts[2] == "www.facebook.com":      #there should be 15
+                        pass
+                        
+                except:
+                    continue
+
+                username = link_parts[3].split(sep="?")
+            
+                if username[0] == "permalink.php":      #remove this string from being considered
+                    continue
+
+                for key in document_dict.keys():
+                    print(key)
+                users.insert_one(temp_dict)
+
+            iter += 1
+            print("Run", iter,"times")
+
+
+
 def execute():     #action happens here
-    # file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading\\Sample_data_file.xlsx'
-    file = getExcelFile()
-    dataLists = findAccounts(file)          #this var is a tuple here because we are returning a tuple of lists
-    accounts = dataLists[0]
-    dates = dataLists[1]
-    activs = dataLists[2]
-    dists = dataLists[3]
-    orgs = dataLists[4]
+    file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading - master\\Sample_data_file.xlsx'
+    # # file = getExcelFile()
+    # # dataLists = findAccounts(file)          #this var is a tuple here because we are returning a tuple of lists
+    # # accounts = dataLists[0]
+    # # dates = dataLists[1]
+    # # activs = dataLists[2]
+    # # dists = dataLists[3]
+    # # orgs = dataLists[4]
 
-    addToDB(accounts, dates, activs, dists, orgs)
+    # addToDB(accounts, dates, activs, dists, orgs)
 
-    print('')
-    main()
+    # print('')
+    # main()
+
+    # excel_file = getExcelFile()
+    csv_path = toCSV(file)
+    store___Mongo(csv_path)
 
 
 def main():
@@ -142,7 +234,8 @@ def main():
         print("Invalid input")
 
 
-main()
+# main()
+execute()
 
 #read and write an excel sheet at the same time:
 # open: parameter: w+
