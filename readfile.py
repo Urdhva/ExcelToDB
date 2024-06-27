@@ -62,41 +62,52 @@ def toCSV(EXCEL_FILE):
     return csv_file_path
 
 
-def store___Mongo(CSV_PATH):
+def store___Mongo(CSV_PATH, EXCEL_FILE):
+    #for mongodatabase
     client = MongoClient("localhost", 27017)
     db = client.facebook_users
     users = db.users
 
+    #for excel sheet
+    df = pd.read_excel(EXCEL_FILE)
+    df = df.assign(Username='')
+    row_to_modify = 0
+    col_to_modify = 'Username'   
 
     with open(CSV_PATH, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
 
         for doc in reader:
-            forCollec = False       #for inserting into our collection
+            #for inserting into our collection
+            isLink = False            
             for value in doc.values():
-                link_parts = value.split("/")       #split the link into parts 
+                link_parts = value.split("/")        
 
                 try:    #try statement here incase our value isn't split into a bunch of parts (for every cell except link)
                     if link_parts[2] == "www.facebook.com":
-                        forCollec = True        #try putting this in a 'finally' statement
+                        isLink = True            
                 except:
                     continue
 
-                if forCollec == True:
+                if isLink == True:
                     username = link_parts[3].split("?")
                     if username[0] == "permalink.php":
-                        forCollec = False
+                        isLink = False
                     else:
-                        forCollec = True
+                        isLink = True
+                        df.loc[row_to_modify, col_to_modify] = username[0]
             
-            if forCollec == True:
+            if isLink == True:                   
                 users.insert_one(doc)
+                df.to_excel(EXCEL_FILE, index=False)
+
+            row_to_modify += 1
                     
 
 def execute():     #action happens here
     file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading - master\\Sample_data_file.xlsx'
     csv_path = toCSV(file)
-    store___Mongo(csv_path)
+    store___Mongo(csv_path, file)
 
 
 def main():
