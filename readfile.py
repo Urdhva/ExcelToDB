@@ -27,7 +27,7 @@ def deleteData():               #deletes every document in the database
     main()
 
 
-def getExcelFile():
+def getUserFile():
     #try except statement won't work here because it's used to catch run-time errors
     #we won't reach our run time error for rinputing the wrong file until much late
 
@@ -43,8 +43,8 @@ def getExcelFile():
             print("-----file doesn't exist-------")
         
         wordBreak = file.split(".")
-        if wordBreak[-1] == "xlsx":
-            print("Correct file type")
+        if wordBreak[-1] == "xlsx" or wordBreak[-1] == "csv":
+            print("File accepted")
             break
         else:
             print("Invalid file or file type\nFile type------>", file_type)
@@ -62,7 +62,7 @@ def toCSV(EXCEL_FILE):
     return csv_file_path
 
 
-def store___Mongo(CSV_PATH, EXCEL_FILE):
+def store___mongo___xcel(CSV_PATH, EXCEL_FILE):
     #for mongodatabase
     client = MongoClient("localhost", 27017)
     db = client.facebook_users
@@ -102,12 +102,50 @@ def store___Mongo(CSV_PATH, EXCEL_FILE):
                 df.to_excel(EXCEL_FILE, index=False)
 
             row_to_modify += 1
-                    
+
+            
+def store__mongo(CSV_PATH):
+    #for mongodatabase
+    client = MongoClient("localhost", 27017)
+    db = client.facebook_users
+    users = db.users
+
+    with open(CSV_PATH, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+
+        for doc in reader:
+            #for inserting into our collection
+            isLink = False            
+            for value in doc.values():
+                link_parts = value.split("/")        
+
+                try:    #try statement here incase our value isn't split into a bunch of parts (for every cell except link)
+                    if link_parts[2] == "www.facebook.com":
+                        isLink = True            
+                except:
+                    continue
+
+                if isLink == True:
+                    username = link_parts[3].split("?")
+                    if username[0] == "permalink.php":
+                        isLink = False
+                    else:
+                        isLink = True
+            
+            if isLink == True:                   
+                users.insert_one(doc)
+
 
 def execute():     #action happens here
-    file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading - master\\Sample_data_file.xlsx'
-    csv_path = toCSV(file)
-    store___Mongo(csv_path, file)
+    # file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading - master\\Sample_data_file.xlsx'
+    file = getUserFile()
+
+    wordBreak = file.split(".")
+    if wordBreak[-1] == "xlsx":
+        csv_path = toCSV(file)
+        store___mongo___xcel(csv_path, file)
+    elif wordBreak[-1] == "csv":
+        store__mongo(file)
 
 
 def main():
@@ -123,8 +161,8 @@ def main():
         print("Invalid input")
 
 
-# main()
-execute()
+main()
+# execute()
 
 #read and write an excel sheet at the same time:
 # open: parameter: w+
