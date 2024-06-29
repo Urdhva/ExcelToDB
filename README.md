@@ -7,3 +7,4 @@ Upcoming extensions:
 4. If cell is empty, remove that key from the database. 
 5. Should take a CSV file as well (Added)
 6. Should accept different fields from an excel file maybe try this: -> https://stackoverflow.com/questions/25241500/how-to-import-excel-file-xlsx-to-mongodb (Added)
+7. Store data for different websites (Added)

@@ -62,7 +62,7 @@ def toCSV(EXCEL_FILE):
     return csv_file_path
 
 
-def store___mongo___xcel(CSV_PATH, EXCEL_FILE):
+def store___mongo___xcel(CSV_PATH, EXCEL_FILE, website):
     #for mongodatabase
     client = MongoClient("localhost", 27017)
     db = client.facebook_users
@@ -84,7 +84,7 @@ def store___mongo___xcel(CSV_PATH, EXCEL_FILE):
                 link_parts = value.split("/")        
 
                 try:    #try statement here incase our value isn't split into a bunch of parts (for every cell except link)
-                    if link_parts[2] == "www.facebook.com":
+                    if link_parts[2] == website:
                         isLink = True            
                 except:
                     continue
@@ -104,7 +104,7 @@ def store___mongo___xcel(CSV_PATH, EXCEL_FILE):
             row_to_modify += 1
 
             
-def store__mongo(CSV_PATH):
+def store__mongo(CSV_PATH, website):
     #for mongodatabase
     client = MongoClient("localhost", 27017)
     db = client.facebook_users
@@ -120,7 +120,7 @@ def store__mongo(CSV_PATH):
                 link_parts = value.split("/")        
 
                 try:    #try statement here incase our value isn't split into a bunch of parts (for every cell except link)
-                    if link_parts[2] == "www.facebook.com":
+                    if link_parts[2] == website:
                         isLink = True            
                 except:
                     continue
@@ -136,16 +136,36 @@ def store__mongo(CSV_PATH):
                 users.insert_one(doc)
 
 
+def getSite():
+    website = "www.facebook.com"
+    while True:
+        while True:
+            try:
+                choice = int(input("Enter 1 to scan for default website (www.facebook.com).\nEnter 2 to scan for custom website.\n->"))
+            except:
+                print("Invalid input, only numbers are accepted")
+            else:
+                break
+        if choice == 1:
+            return website
+        elif choice == 2: 
+            website = input("Enter website name: ")
+            return website
+        else:
+            print("Invalid input\n")
+
+
 def execute():     #action happens here
     # file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading - master\\Sample_data_file.xlsx'
     file = getUserFile()
+    website = getSite()
 
     wordBreak = file.split(".")
     if wordBreak[-1] == "xlsx":
         csv_path = toCSV(file)
-        store___mongo___xcel(csv_path, file)
+        store___mongo___xcel(csv_path, file, website)
     elif wordBreak[-1] == "csv":
-        store__mongo(file)
+        store__mongo(file, website)
 
 
 def main():
@@ -162,7 +182,6 @@ def main():
 
 
 main()
-# execute()
 
 #read and write an excel sheet at the same time:
 # open: parameter: w+
