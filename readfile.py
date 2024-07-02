@@ -1,12 +1,13 @@
 # To start and stop your mognoDB server: Windows + R; type "services.msc" and look for MongoDB server
 
-import pandas as pd     #file dataframe management
+import pandas as pd     # file dataframe management
 from pymongo import MongoClient
-import gettext
-import magic            #used for file type checking - doesn't work on excel files for some reason
+import pprint
+import magic            # used for file type checking - doesn't work on excel files for some reason
 import csv
 
-def deleteData():               #deletes every document in the database
+# deletes every document in the database
+def deleteData():               
     client = MongoClient("localhost", 27017)
 
     db = client.facebook_users          #import database
@@ -61,7 +62,8 @@ def toCSV(EXCEL_FILE):
 
     return csv_file_path
 
-
+# for excel files
+# Will use this function
 def store___mongo___xcel(CSV_PATH, EXCEL_FILE, website):
     #for mongodatabase
     client = MongoClient("localhost", 27017)
@@ -103,7 +105,11 @@ def store___mongo___xcel(CSV_PATH, EXCEL_FILE, website):
 
             row_to_modify += 1
 
-            
+    print("")
+    main()
+
+# for CSV files only
+# Probably will not use this function    
 def store__mongo(CSV_PATH, website):
     #for mongodatabase
     client = MongoClient("localhost", 27017)
@@ -135,6 +141,9 @@ def store__mongo(CSV_PATH, website):
             if isLink == True:                   
                 users.insert_one(doc)
 
+    print("")
+    main()
+
 
 def getSite():
     website = "www.facebook.com"
@@ -155,8 +164,8 @@ def getSite():
             print("Invalid input\n")
 
 
-#test function
-def readData():
+# test function
+def testFunc():
     client = MongoClient("localhost", 27017)
     db = client.facebook_users
     collec = db.collec
@@ -168,8 +177,39 @@ def readData():
         for row in reader:
             collec.insert_one(row)
 
+
+# read data from the database and put it back into an excel file
+def createExcel():
+    client = MongoClient("localhost", 27017)
+    db = client.facebook_users
+    collec = db.users  
+
+    # incase database is empty
+    try:
+        cursor = collec.find()
+        doc_1 = cursor[1]
+    except:
+        print("no documents present")
+        return
+    
+    col_names = list(doc_1.keys())
+    # removing the _id_ col header
+    col_names.pop(0)            
+    
+    # col_names are now columns
+    df = pd.DataFrame(columns=col_names)
+
+    for doc in cursor:
+        doc = dict(doc)     # force doc to become a dictionary object
+        doc.pop("_id")      # now its dict object, thus pop will always work
         
-def execute():     #action happens here
+        df = df._append(doc, ignore_index=True)
+
+    df.to_excel("temp_excel.xlsx", index=False)
+        
+
+#action happens here
+def execute():     
     # file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading - master\\Sample_data_file.xlsx'
     file = getUserFile()
     website = getSite()
@@ -195,9 +235,5 @@ def main():
         print("Invalid input")
 
 
-main()
-# readData()
-
-#read and write an excel sheet at the same time:
-# open: parameter: w+
-    
+# main()
+createExcel()  
