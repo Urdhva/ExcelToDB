@@ -2,7 +2,7 @@
 
 import pandas as pd     #file dataframe management
 from pymongo import MongoClient
-# import pymongo
+import gettext
 import magic            #used for file type checking - doesn't work on excel files for some reason
 import csv
 
@@ -74,7 +74,7 @@ def store___mongo___xcel(CSV_PATH, EXCEL_FILE, website):
     row_to_modify = 0
     col_to_modify = 'Username'   
 
-    with open(CSV_PATH, newline='') as csvfile:
+    with open(CSV_PATH, newline='', encoding="utf8") as csvfile:
         reader = csv.DictReader(csvfile)
 
         for doc in reader:
@@ -110,7 +110,7 @@ def store__mongo(CSV_PATH, website):
     db = client.facebook_users
     users = db.users
 
-    with open(CSV_PATH, newline='') as csvfile:
+    with open(CSV_PATH, newline='', encoding="utf8") as csvfile:
         reader = csv.DictReader(csvfile)
 
         for doc in reader:
@@ -155,6 +155,20 @@ def getSite():
             print("Invalid input\n")
 
 
+#test function
+def readData():
+    client = MongoClient("localhost", 27017)
+    db = client.facebook_users
+    collec = db.collec
+
+    #we use newline='' here because csv files are 'file objects'
+    with open("facebookCSVdata.csv", newline='', encoding="utf8") as file:
+        reader = csv.DictReader(file, delimiter=',')
+
+        for row in reader:
+            collec.insert_one(row)
+
+        
 def execute():     #action happens here
     # file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading - master\\Sample_data_file.xlsx'
     file = getUserFile()
@@ -182,6 +196,7 @@ def main():
 
 
 main()
+# readData()
 
 #read and write an excel sheet at the same time:
 # open: parameter: w+
