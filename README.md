@@ -7,4 +7,4 @@ Upcoming extensions:
 6. Should accept different fields from an excel file. (Added)
 7. Store data for different websites (Added)
 8. Take in files that have different languages in their text (Added)
-9. Read a collection and store it back into an Excel/csv file
+9. Read a collection and store it back into an Excel (Added)
