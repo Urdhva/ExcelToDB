@@ -8,3 +8,5 @@ Upcoming extensions:
 7. Store data for different websites (Added)
 8. Take in files that have different languages in their text (Added)
 9. Read a collection and store it back into an Excel (Added)
+10. Duplicate entries that have different descriptions (i.e. a single column has different data) should be printed to the console
+11. (Continuation of 10) such entries should be added to a "logger"
