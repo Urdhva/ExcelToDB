@@ -1,10 +1,13 @@
 # To start and stop your mognoDB server: Windows + R; type "services.msc" and look for MongoDB server
 
-import pandas as pd     # file dataframe management
+# file dataframe management
+import pandas as pd     
 from pymongo import MongoClient
-import pprint
-import magic            # used for file type checking - doesn't work on excel files for some reason
+# import pprint
+# used for file type checking - doesn't work on excel files for some reason
+import magic            
 import csv
+#the program also uses openpyxl, make sure you have the module installed
 
 # deletes every document in the database
 def deleteData():               
@@ -235,5 +238,6 @@ def main():
         print("Invalid input")
 
 
-# main()
-createExcel()  
+main()
+#test
+# createExcel()  
