@@ -79,11 +79,12 @@ def store___mongo___xcel(CSV_PATH, EXCEL_FILE, website):
     row_to_modify = 0
     col_to_modify = 'Username'   
 
+    # utf8 to accept unicode
     with open(CSV_PATH, newline='', encoding="utf8") as csvfile:
         reader = csv.DictReader(csvfile)
 
         for doc in reader:
-            #for inserting into our collection
+            # for inserting into our collection
             isLink = False            
             for value in doc.values():
                 link_parts = value.split("/")        
@@ -93,7 +94,8 @@ def store___mongo___xcel(CSV_PATH, EXCEL_FILE, website):
                         isLink = True            
                 except:
                     continue
-
+                
+                # is link checks if the row has the required link
                 if isLink == True:
                     username = link_parts[3].split("?")
                     if username[0] == "permalink.php":
@@ -102,7 +104,8 @@ def store___mongo___xcel(CSV_PATH, EXCEL_FILE, website):
                         isLink = True
                         df.loc[row_to_modify, col_to_modify] = username[0]
             
-            if isLink == True:                   
+            if isLink == True:
+                # value here is all the values in 
                 users.insert_one(doc)
                 df.to_excel(EXCEL_FILE, index=False)
 
@@ -148,6 +151,22 @@ def store__mongo(CSV_PATH, website):
     main()
 
 
+def simple_copy_to_DB(CSV_PATH):
+    #for mongodatabase
+    client = MongoClient("localhost", 27017)
+    db = client.facebook_users
+    users = db.users
+
+    with open(CSV_PATH, newline='', encoding="utf8") as csvfile:
+        reader = csv.DictReader(csvfile)
+
+        for doc in reader:            
+            users.insert_one(doc)
+
+    print("")
+    main()
+
+
 def getSite():
     website = "www.facebook.com"
     while True:
@@ -165,20 +184,6 @@ def getSite():
             return website
         else:
             print("Invalid input\n")
-
-
-# test function
-def testFunc():
-    client = MongoClient("localhost", 27017)
-    db = client.facebook_users
-    collec = db.collec
-
-    #we use newline='' here because csv files are 'file objects'
-    with open("facebookCSVdata.csv", newline='', encoding="utf8") as file:
-        reader = csv.DictReader(file, delimiter=',')
-
-        for row in reader:
-            collec.insert_one(row)
 
 
 # read data from the database and put it back into an excel file
@@ -224,15 +229,23 @@ def execute():
     elif wordBreak[-1] == "csv":
         store__mongo(file, website)
 
+def execute2():
+    file = getUserFile()
+    csv_file = toCSV(file)
+
+    simple_copy_to_DB(csv_file)
+
 
 def main():
-    choice = int(input("Insert sheet and add data: 1\nDelete Data: 2\nExit Program: 3\n-> "))
+    choice = int(input("Insert sheet and add data: 1\nDelete Data: 2\nSimply copy excel data to a DB: 3\nExit Program: 4\n-> "))
 
     if choice == 1:
         execute()
     elif choice == 2:
         deleteData()
     elif choice == 3:
+        execute2()
+    elif choice == 4:
         print("Exiting program...")
     else:
         print("Invalid input")
