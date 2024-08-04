@@ -3,7 +3,6 @@
 # file dataframe management
 import pandas as pd     
 from pymongo import MongoClient
-# import pprint
 # used for file type checking - doesn't work on excel files for some reason
 import magic            
 import csv
@@ -43,8 +42,8 @@ def getUserFile():
             file = input("Enter an excel file: ")
             file_type = magic.from_file(file)       
             #the method 'from_file' returns the file type, but I'm using it here to make sure the file entered exists
-        except:
-            print("-----file doesn't exist-------")
+        except Exception as e:
+            print(e)
         
         wordBreak = file.split(".")
         if wordBreak[-1] == "xlsx" or wordBreak[-1] == "csv":
@@ -252,5 +251,3 @@ def main():
 
 
 main()
-#test
-# createExcel()  
