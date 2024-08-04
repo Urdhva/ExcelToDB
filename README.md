@@ -1,3 +1,7 @@
+**Modules that take in csv type files and store them in databases.**
+Stores rows of csv type files that contain a certain website link (eg: facebook.com).
+Removes special characters in csv type files before storing them.
+
 Upcoming extensions:
 1. Store every key from the excel file to the database. (Added)
 2. Parse the username from the excel file and add it as a new column in the same excel file. (Added) 
