@@ -1,3 +1,11 @@
+#What Nickil sir said about this 
+#Create a dataset that goes through every single character in the username
+#Then check whether that character is a special character or not. If it is, remove it.
+#Making a dataset and comparing every single character to everysingle special character would 
+#increase time complexity drastically (n times m; where n is the total number of characters
+#of every single string and m is the number of special characters in the database.)
+
+
 #program to remove special characters and honorifics from names
 #Procedure:
 #1. Take in a csv or (convert an excel to csv if excel is given).
@@ -10,10 +18,14 @@
 import pandas as pd
 import magic 
 import csv
+# import unicodedata
+# import Unicode
 
 def getFile():
     file_path = ''
     fType = ''
+    # Data files\Non_Latin_kanji.csv
+    # Data files\Latin_Kanji_names.csv
 
     try:
         file_path = input("Enter file: ")
@@ -25,23 +37,27 @@ def getFile():
     print("Correct file type")
     return file_path
 
+def is_devanagari_dependent_vowel(char):
+    # Unicode range for Devanagari dependent vowel signs
+    return '\u093A' <= char <= '\u094F' or char in ['\u0962', '\u0963', '\u0900', '\u0901', '\u0902', '\u0903']
 
 def openFile(file_path):
-    with open(file_path, newline='', encoding="utf8") as file1:
+    # print("Opening reader...")
+    with open(file_path, newline='', encoding="utf-8") as file1:
+        # print("Reader opened")
         reader = csv.DictReader(file1)
 
         #iterates through each row
         
         for doc in reader:
+            print(doc)
             # print(doc["Username"])
-            deliminator = ""
-            remadeString = "".join(ch for ch in doc["Username"] if ch.isalnum())
+            # deliminator = ""
+            remadeString = "".join(ch for ch in doc["Username"] if ch.isalnum() or is_devanagari_dependent_vowel(ch))
             #we join ch to remadeString if ch(an iterable btw) is alpha numerical
 
             print(remadeString)
             
-                
-        
 
 
 def execute():
@@ -51,7 +67,10 @@ def execute():
     if file_path == None:
         return
     
+    # print("Filel shall be opened")
     openFile(file_path)
+
+
 
 
 def main():
