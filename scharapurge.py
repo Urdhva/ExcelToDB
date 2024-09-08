@@ -1,4 +1,3 @@
-#What Nickil sir said about this 
 #Create a dataset that goes through every single character in the username
 #Then check whether that character is a special character or not. If it is, remove it.
 #Making a dataset and comparing every single character to everysingle special character would 
@@ -13,6 +12,10 @@
 #3. Replace the name containing special characters and honorifics with the truncated name.
 # ^To do the above step, truncate every character that isn't in a certain unicode range
 #4. Voila
+
+
+#REDO THIS PROGRAM
+#CREATE A DATABSE OF SPECIAL CHARACTERS AND COMPARE STRING ELEMENTS TO THAT DATBASE
 
 #dataframe management
 import pandas as pd
@@ -39,7 +42,21 @@ def getFile():
 
 def is_devanagari_dependent_vowel(char):
     # Unicode range for Devanagari dependent vowel signs
-    return '\u093A' <= char <= '\u094F' or char in ['\u0962', '\u0963', '\u0900', '\u0901', '\u0902', '\u0903']
+    return '\u093A' <= char <= '\u094F' or char in [
+        '\u0900',
+        '\u0901',
+        '\u0902',
+        '\u0903',
+        '\u0955',
+        '\u0956',
+        '\u0957',
+        '\u0962',
+        '\u0963',
+        '\u0964',
+        '\u0965',
+        '\u0970',
+        '\u0971',
+    ]
 
 def openFile(file_path):
     # print("Opening reader...")
