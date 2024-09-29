@@ -1,10 +1,11 @@
 dataInCSV
 sample.json
 Data files
-Test files
+Test and retired files
 scharapurge.py
 upcoming.txt
 __pycache__
+.vscode
 *docx
 *xlsx
 *csv

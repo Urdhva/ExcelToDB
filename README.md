@@ -1,1 +1,1 @@
-A simple program that takes in csv type files and stores cleaned usernames from different social media posts
+A simple program that transfers csv and excel data to collections.
