@@ -1,11 +1,10 @@
-# To start and stop your mognoDB server: Windows + R; type "services.msc" and look for MongoDB server
-
 # file dataframe management
 import pandas as pd     
 from pymongo import MongoClient
 # used for file type checking - doesn't work on excel files for some reason
 import magic            
 import csv
+# import purgeSCh
 #the program also uses openpyxl, make sure you have the module installed
 
 # deletes every document in the database
@@ -28,7 +27,6 @@ def deleteData():
 
     print('')
     main()
-
 
 def getUserFile():
     #try except statement won't work here because it's used to catch run-time errors
@@ -54,7 +52,6 @@ def getUserFile():
 
     return file
 
-
 def toCSV(EXCEL_FILE):
     df = pd.read_excel(EXCEL_FILE)      #pandas read excel
 
@@ -64,57 +61,7 @@ def toCSV(EXCEL_FILE):
 
     return csv_file_path
 
-# for excel files
-# Will use this function
-def store___mongo___xcel(CSV_PATH, EXCEL_FILE, website):
-    #for mongodatabase
-    client = MongoClient("localhost", 27017)
-    db = client.facebook_users
-    users = db.users
-
-    #for excel sheet
-    df = pd.read_excel(EXCEL_FILE)
-    df = df.assign(Username='')
-    row_to_modify = 0
-    col_to_modify = 'Username'   
-
-    # utf8 to accept unicode
-    with open(CSV_PATH, newline='', encoding="utf8") as csvfile:
-        reader = csv.DictReader(csvfile)
-
-        for doc in reader:
-            # for inserting into our collection
-            isLink = False            
-            for value in doc.values():
-                link_parts = value.split("/")        
-
-                try:    #try statement here incase our value isn't split into a bunch of parts (for every cell except link)
-                    if link_parts[2] == website:
-                        isLink = True            
-                except:
-                    continue
-                
-                # is link checks if the row has the required link
-                if isLink == True:
-                    username = link_parts[3].split("?")
-                    if username[0] == "permalink.php":
-                        isLink = False
-                    else:
-                        isLink = True
-                        df.loc[row_to_modify, col_to_modify] = username[0]
-            
-            if isLink == True:
-                # value here is all the values in 
-                users.insert_one(doc)
-                df.to_excel(EXCEL_FILE, index=False)
-
-            row_to_modify += 1
-
-    print("")
-    main()
-
-# for CSV files only
-# Probably will not use this function    
+#stores CSV entries with specific entries   
 def store__mongo(CSV_PATH, website):
     #for mongodatabase
     client = MongoClient("localhost", 27017)
@@ -149,7 +96,7 @@ def store__mongo(CSV_PATH, website):
     print("")
     main()
 
-
+#copy pastes all data into collection
 def simple_copy_to_DB(CSV_PATH):
     #for mongodatabase
     client = MongoClient("localhost", 27017)
@@ -164,7 +111,6 @@ def simple_copy_to_DB(CSV_PATH):
 
     print("")
     main()
-
 
 def getSite():
     website = "www.facebook.com"
@@ -184,37 +130,6 @@ def getSite():
         else:
             print("Invalid input\n")
 
-
-# read data from the database and put it back into an excel file
-def createExcel():
-    client = MongoClient("localhost", 27017)
-    db = client.facebook_users
-    collec = db.users  
-
-    # incase database is empty
-    try:
-        cursor = collec.find()
-        doc_1 = cursor[1]
-    except:
-        print("no documents present")
-        return
-    
-    col_names = list(doc_1.keys())
-    # removing the _id_ col header
-    col_names.pop(0)            
-    
-    # col_names are now columns
-    df = pd.DataFrame(columns=col_names)
-
-    for doc in cursor:
-        doc = dict(doc)     # force doc to become a dictionary object
-        doc.pop("_id")      # now its dict object, thus pop will always work
-        
-        df = df._append(doc, ignore_index=True)
-
-    df.to_excel("temp_excel.xlsx", index=False)
-        
-
 #action happens here
 def execute():     
     # file = 'C:\\Users\\Urdhv\\Desktop\\Python programs\\FileReading - master\\Sample_data_file.xlsx'
@@ -223,8 +138,9 @@ def execute():
 
     wordBreak = file.split(".")
     if wordBreak[-1] == "xlsx":
+        #converts to csv then calls function
         csv_path = toCSV(file)
-        store___mongo___xcel(csv_path, file, website)
+        store__mongo(csv_path, website)
     elif wordBreak[-1] == "csv":
         store__mongo(file, website)
 
@@ -236,14 +152,16 @@ def execute2():
 
 
 def main():
-    choice = int(input("Insert sheet and add data: 1\nDelete Data: 2\nSimply copy excel data to a DB: 3\nExit Program: 4\n-> "))
+    choice = int(input("Insert all data to collection: 1\nDelete Data: 2\nStore data with specific websites: 3\nExit Program: 4\n-> "))
 
     if choice == 1:
-        execute()
+        # execute()
+        execute2()
     elif choice == 2:
         deleteData()
     elif choice == 3:
-        execute2()
+        # execute2()
+        execute()
     elif choice == 4:
         print("Exiting program...")
     else:

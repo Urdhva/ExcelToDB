@@ -4,6 +4,7 @@ Data files
 Test files
 scharapurge.py
 upcoming.txt
+__pycache__
 *docx
 *xlsx
 *csv
