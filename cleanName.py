@@ -12,7 +12,16 @@ def isSChara(ch):
         or '\u007B' <= ch <= '\u007E' 
         or '\u00A0' <= ch <= '\u00BE') else True
 
+def rmHonorific(name):
+    #list of honorifics that will be removed from the name
+    honorifics = ["Mr. ", "Ms. ", "Mrs. ", "Dr. ", ]
+    for honor in honorifics:
+        if honor in name:
+           name = name.replace(honor, "")
+    return name
+
 def purgeChara(temp):
+    temp = rmHonorific(temp)
     remadeString = "".join(ch for ch in temp if isSChara(ch))
     print(remadeString)
     return remadeString
