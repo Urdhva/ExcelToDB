@@ -1,12 +1,12 @@
 #read complete data from collection, store it all in a csv file
 #clean up the usernames, then delete collection, and rewrite the collection
 
-import magic
-import csv
+# import magic
+# import csv
 from pymongo import MongoClient
 import pandas as pd
 
-def isSChara(ch):
+def isSpecialChara(ch):
     return False if ('\u0000' <= ch <= '\u002F'
         or '\u005B' <= ch <= '\u0060'
         or '\u007B' <= ch <= '\u007E' 
@@ -22,7 +22,7 @@ def rmHonorific(name):
 
 def purgeChara(temp):
     temp = rmHonorific(temp)
-    remadeString = "".join(ch for ch in temp if isSChara(ch))
+    remadeString = "".join(ch for ch in temp if isSpecialChara(ch))
     print(remadeString)
     return remadeString
 
