@@ -14,7 +14,7 @@ def isSpecialChara(ch):
 
 def rmHonorific(name):
     #list of honorifics that will be removed from the name
-    honorifics = ["Mr. ", "Ms. ", "Mrs. ", "Dr. ", ]
+    honorifics = ["Mr. ", "Ms. ", "Mrs. ", "Dr. ", "mr. ", "ms. ", "mrs. ", "dr. "]
     for honor in honorifics:
         if honor in name:
            name = name.replace(honor, "")
